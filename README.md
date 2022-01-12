@@ -1,6 +1,7 @@
 # Drupal Interview Questions &amp; Answers (2022 Update)
 
-
+### How to find out what a class can do?
+Read its PHPDoc block comments, duh!
 
 ### How to load an entity
 ````
@@ -67,3 +68,73 @@ In order of popularity.
 `drush pm:security-php`  
 `drush user:login`  
 
+
+### The list of commonly used static methods
+````
+\Drupal::currentUser();
+\Drupal::routeMatch();
+
+````
+
+### Injecting Dependencies to a Service
+1. Add a file `{module_name}.services.yml` with code.  
+2. Add arguments to service declaration under the key "arguments" and add the symbol "@" before the service name:  
+````
+services:
+  {name}.event_subscriber:
+    class: Drupal\{module_name}\EventSubscriber\SomeNameEventSubscriber
+    arguments: ['@logger.factory', '@entity_type.manager']
+    tags:
+      - {name: event_subscriber}
+````
+3. Update `__construct()` method to receive and store the injected services, like:
+````
+public function __construct(LoggerChannelFactoryInterface $loggerFactory, EntityTypeManagerInterface $entity_type_manager) {
+  $this->logger = $loggerFactory->get('download_files');
+  $this->entityTypeManager = $entity_type_manager;
+}
+````
+
+### Injecting Dependencies to a Block
+1. Implement Drupal\Core\Plugin\ContainerFactoryPluginInterface in the class:
+````
+class DownloadFilesBlock extends BlockBase implements ContainerFactoryPluginInterface
+````
+2. Update __construct() method to receive and store the injected services:
+````
+public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->formBuilder = $form_builder;
+  }
+````
+3. Implement create() method and use the service container to pass the services needed by the constructor:
+````
+public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('form_builder')
+    );
+  }
+````
+(Here is the PHP theory behind this upper part - `return new static` - https://www.php.net/manual/en/language.oop5.decon.php#example-228 )
+
+
+### What are all the symphony components used by Drupal 8?
+* ClassLoader
+* Console
+* CssSelector
+* Debug
+* DependencyInjection
+* EventDispatcher
+* HttpFoundation
+* HttpKernel
+* PHPUnit Bridge
+* Polyfill Iconv
+* Process
+* Routing
+* Serializer
+* Translation
+* Validator
+* Yaml
