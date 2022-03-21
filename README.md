@@ -311,5 +311,41 @@ https://www.ostraining.com/blog/drupal/delta/
 ### What is Plugin in Drupal
 https://evolvingweb.ca/blog/introduction-services-plugins-and-events-drupal
 
+### What's the difference between image and container
+
+### Get a list of all users and into an array
+````php
+$query = \Drupal::entityQuery('user');
+
+$uids = $query->execute();
+````
+
+### How to reach/obtain the configuration of a module?
+````php
+$max_depth = \Drupal::config('admin_toolbar.settings')->get('menu_depth');
+````
+
+### Get a list of users with certain role
+````php
+$userlist[] = \Drupal\user\Entity\User::load(1)->get('mail')->value;
+$ids = \Drupal::entityQuery('user')
+  ->condition('status', 1)
+  ->condition('roles', 'guest')
+  ->execute();
+$users = User::loadMultiple($ids);
+foreach ($users as $user) {
+  $mail = $user->get('mail')->getString();
+  $userlist[] = $mail;
+}
+
+````
+
+### List all variables in a given Twig
+Just a list of available variables:
+````{{ dpm() }}````, ````{{ dpm(_context|keys) }}````  
+Global variables available in all Twig templates: `_context`, `_parent`.  
+Symfony's dumper is used (must be selected in Devel settings), `dump()` doesn't work.  
+For X-debug `{{ devel_breakpoint() }}` is used.
+
 
 
