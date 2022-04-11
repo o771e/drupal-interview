@@ -347,5 +347,51 @@ Global variables available in all Twig templates: `_context`, `_parent`.
 Symfony's dumper is used (must be selected in Devel settings), `dump()` doesn't work.  
 For X-debug `{{ devel_breakpoint() }}` is used.
 
+### How to see the permission name at `admin/people/permissions`
+Enable 'Display machine names of permissions and modules' in Devel settings.
+
+## Code snippets
+### How do I access a field value for an entity (e.g. node) object?
+````PHP
+$entity->get('field_name')->getValue();
+$entity->get('field_name')->value;
+$entity->field_name->value;
+````
+
+### How to create a new permission
+Create a new file 'module_name.permissions.yml'
+````YAML
+access meta tab:
+  title: 'Access meta tab'
+  description: 'Access meta information (author, creation date, boost information) in Meta vertical tab.'
+````
+Check permission in 'module_name.module'
+````PHP
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ *
+ * Completely hide the Meta vertical tab (field group) from people without permission.
+ *
+ */
+function HOOK_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // If the current user has the permission, do not hide the Meta vertical tab.
+  if (\Drupal::currentUser()->hasPermission('access meta tab')) {
+    return;
+  }
+  // Code to hide the meta tab goes here, and is only reached if the user lacks the permission. 
+  // ...
+}
+````
+
+### How to create a new menu entry
+Creane a new route with a controller. Create a file 'my_module.links.menu.yml' and add code. 
+````YAML
+# Define default links for this module.
+site_name.config:
+  title: 'MY SITE'
+  description: 'A list of available configurations'
+  route_name: my_site.config
+  parent: system.admin
+````
 
 
