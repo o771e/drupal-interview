@@ -49,6 +49,7 @@ sudo find files/ -type f -exec chmod 777 {} \;
 
 ### Drush commands
 In order of popularity.  
+`drush user:password USERNAME "SOMEPASSWORD"` (drush upwd) --notify  
 `drush cr`  
 `drush cex -y`  
 `drush cim`  
@@ -340,6 +341,18 @@ foreach ($users as $user) {
 
 ````
 
+### Check if a user has a role
+````PHP
+if (in_array('administrator', \Drupal::currentUser()->getRoles())) {
+  // Your code here.
+}
+````
+
+### Get current time
+````PHP
+\Drupal::time()->getCurrentTime()
+````
+
 ### List all variables in a given Twig
 Just a list of available variables:
 ````{{ dpm() }}````, ````{{ dpm(_context|keys) }}````  
@@ -394,4 +407,34 @@ site_name.config:
   parent: system.admin
 ````
 
+### Get default value of field in an entity
+````PHP
+$bundle_fields = $this->fieldManager->getFieldDefinitions('node', 'property');
+if ($field_definition = $bundle_fields['field_terms_conditions']) {
+  $field_terms_conditions_default_value = $field_definition->get('default_value')[0]['value'];
+}
+else {
+  $field_terms_conditions_default_value = '';
+}
+````
 
+### How to get theme path?
+````PHP
+global $base_url;
+$theme = \Drupal::theme()->getActiveTheme();
+$path = $base_url.'/'. $theme->getPath() .'/images';
+````
+
+### How to create/drop database
+````PHP
+  $schema = drupal_get_module_schema('booksmarter', 'bs_payments');
+  \Drupal::database()->schema()->dropTable('bs_payments');
+  \Drupal::database()->schema()->createTable('bs_payments', $schema);
+````
+
+### Write data into database:
+````PHP
+$this->connection->insert('bs_payments')->fields([
+  'uid' => $uid,
+])->execute();
+````
